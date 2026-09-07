@@ -17,6 +17,7 @@
     --accent-dim:#2E4A47;
     --warn:#E0A458;
     --radius:10px;
+    --text-on-dark:#E8EAED;
   }
   *{box-sizing:border-box;}
   body{
@@ -118,7 +119,7 @@
     margin-bottom:20px;
   }
   .summary .label{color:var(--muted); font-size:0.8rem; margin-bottom:4px;}
-  .summary .value{font-size:1.05rem; font-weight:500;}
+  .summary .value{font-size:1.05rem; font-weight:500; color:var(--text-on-dark);}
   .summary .row{display:flex; justify-content:space-between; margin-top:14px; padding-top:14px; border-top:1px solid var(--border);}
   .status-pill{
     display:inline-block;
@@ -139,7 +140,7 @@
     margin-bottom:20px;
     font-size:0.9rem;
   }
-  .note-card .value{color:var(--text); line-height:1.5;}
+  .note-card .value{color:var(--text-on-dark); line-height:1.5;}
 
   .progress-wrap{
     background:var(--surface);
@@ -154,7 +155,7 @@
   .progress-labels{display:flex; margin-top:10px;}
   .progress-labels span{flex:1; font-size:0.68rem; color:var(--muted); text-align:center; line-height:1.3; padding:0 2px;}
   .progress-labels span.current{color:var(--accent); font-weight:600;}
-  .progress-labels span.done{color:var(--text);}
+  .progress-labels span.done{color:var(--text-on-dark);}
 
   .error, .loading{margin-top:20px; padding:14px 16px; border-radius:8px; font-size:0.9rem;}
   .error{background:#3A2323; color:#E88A8A; border:1px solid #4A2C2C;}
@@ -182,7 +183,7 @@
   .form-field input:focus{border-color:var(--accent);}
   .form-field input::placeholder{color:#4B525E;}
   .service-form button{width:100%; min-height:46px; margin-top:4px;}
-  .service-form-message{display:none; padding:12px 14px; border-radius:8px; font-size:0.88rem; line-height:1.4;}
+  .service-form-message{display:none; padding:12px 14px; border-radius:8px; font-size:0.88rem; line-height:1.4; background:var(--accent-dim); color:var(--accent);}
 </style>
 </head>
 <body>
@@ -369,57 +370,13 @@
 </div>
 
 <script>
-/* =========================================================================
-   SETUP  read this before publishing
-   =========================================================================
-   This portal uses THREE separate data sources. They never mix:
-
-   -------------------------------------------------------------------------
-   TAB 1  WARRANTY STATUS  (its own sheet, its own progress bar)
-   -------------------------------------------------------------------------
-   Column headers (row 1):
-     SerialNumber | CustomerName | Status | HandoverDate | LastUpdated | EstimatedCompletion | Notes
-
-   Status must be one of:
-     Received, Diagnosis, Parts Ordered, In Repair, Ready for Pickup, Completed, On Hold
-
-   Publish this sheet to web as CSV (File > Share > Publish to web > CSV),
-   then paste the link into WARRANTY_SHEET_CSV_URL below.
-
-   -------------------------------------------------------------------------
-   TAB 2  SERVICE STATUS  (a DIFFERENT sheet, a DIFFERENT progress bar)
-   -------------------------------------------------------------------------
-   Column headers (row 1):
-     SerialNumber | CustomerName | Status | ScheduledDate | ServiceEndDate | LastUpdated | Notes
-
-   Status should be one of:
-     Processing, Scheduled, Service in Progress, Complete, On Hold
-   You do NOT have to set Status yourself for the "Scheduled" stage  if you
-   leave Status blank but fill in ScheduledDate, it automatically shows as
-   "Scheduled". This is the field you fill in after reviewing a customer's
-   booking from Tab 3 and deciding their appointment date.
-
-   Publish this sheet to web as CSV too, then paste its link into
-   SERVICE_SHEET_CSV_URL below. It is a SEPARATE published link from the
-   warranty sheet  don't reuse the same one for both.
-
-   -------------------------------------------------------------------------
-   TAB 3  BOOK A SERVICE  (Google Form, already embedded)
-   -------------------------------------------------------------------------
-   Submissions land in their own Form-linked spreadsheet automatically.
-   That sheet is just a raw inbox of requests  after reviewing one, you
-   manually add/update that customer's row in the TAB 2 sheet above with
-   their Serial Number and a ScheduledDate.
-   ========================================================================= */
-
 const WARRANTY_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRcElB9lq25oarwBjdoh4_x8OnKvUZZKibCspAKZgZnKSdEwf37C9n8s4xU4E0NM750wsKTUPM0UrkH/pub?gid=0&single=true&output=csv";
 const SERVICE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRcElB9lq25oarwBjdoh4_x8OnKvUZZKibCspAKZgZnKSdEwf37C9n8s4xU4E0NM750wsKTUPM0UrkH/pub?gid=526123895&single=true&output=csv";
 
-// Fallback demo data  shown until you connect real sheet links above.
 const WARRANTY_DEMO_DATA = [
   {SerialNumber:"SN12345", CustomerName:"Aditi Rao", Status:"In Repair", HandoverDate:"2026-09-01", LastUpdated:"2026-09-03", EstimatedCompletion:"2026-09-10", Notes:"Awaiting replacement screen from vendor"},
   {SerialNumber:"SN99000", CustomerName:"Meera Nair", Status:"Received", HandoverDate:"2026-09-05", LastUpdated:"2026-09-05", EstimatedCompletion:"", Notes:""},
-  {SerialNumber:"SN77002", CustomerName:"Rohan Das", Status:"On Hold", HandoverDate:"2026-09-02", LastUpdated:"2026-09-04", EstimatedCompletion:"", Notes:"Warranty claim needs proof of purchase  please email a copy of your invoice"}
+  {SerialNumber:"SN77002", CustomerName:"Rohan Das", Status:"On Hold", HandoverDate:"2026-09-02", LastUpdated:"2026-09-04", EstimatedCompletion:"", Notes:"Warranty claim needs proof of purchase - please email a copy of your invoice"}
 ];
 
 const SERVICE_DEMO_DATA = [
@@ -463,7 +420,7 @@ function renderBar(barEl, labelsEl, stages, currentIndex, onHold){
     barEl.appendChild(seg);
     const lab = document.createElement("span");
     lab.className = "current";
-    lab.textContent = "On hold  see note above";
+    lab.textContent = "On hold - see note above";
     lab.style.flex = "1";
     labelsEl.appendChild(lab);
     return;
@@ -482,7 +439,6 @@ function renderBar(barEl, labelsEl, stages, currentIndex, onHold){
   });
 }
 
-/* ---------------------------- WARRANTY TAB ---------------------------- */
 async function checkWarranty(){
   const idInput = document.getElementById("warrantyLookup").value.trim().toLowerCase();
   const errorBox = document.getElementById("warrantyError");
@@ -550,13 +506,12 @@ async function checkWarranty(){
   }
 }
 
-/* ---------------------------- SERVICE TAB ---------------------------- */
 function computeServiceStageIndex(match){
   const status = (match.Status || "").trim();
   const idx = SERVICE_STAGES.indexOf(status);
   if (idx !== -1) return idx;
-  if (match.ScheduledDate && match.ScheduledDate.trim()) return 1; // Scheduled
-  return 0; // Processing
+  if (match.ScheduledDate && match.ScheduledDate.trim()) return 1;
+  return 0;
 }
 
 async function checkService(){
@@ -631,7 +586,6 @@ document.getElementById("warrantyLookup").addEventListener("keydown", e => { if 
 document.getElementById("serviceCheckBtn").addEventListener("click", checkService);
 document.getElementById("serviceLookup").addEventListener("keydown", e => { if (e.key === "Enter") checkService(); });
 
-/* ---------------------------- TAB SWITCHING ---------------------------- */
 const tabBtns = document.querySelectorAll(".tab-btn");
 const tabPanels = document.querySelectorAll(".tab-panel");
 tabBtns.forEach(btn => {
@@ -645,12 +599,6 @@ tabBtns.forEach(btn => {
 </script>
 
 <script>
-  /*
-    GOOGLE SHEET SUBMISSION SETUP
-    Replace the URL below with your deployed Google Apps Script Web App URL.
-    Example:
-    https://script.google.com/macros/s/XXXXXXXXXXXX/exec
-  */
   const SERVICE_BOOKING_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrdlFYnnW4T-4CoYrupMNnUqxO81IvNJOA2jvvRiTB0aPVBV_MKBHMPRh7ce9jDe-e/exec";
 
   const serviceBookingForm = document.getElementById("serviceBookingForm");
@@ -670,8 +618,6 @@ tabBtns.forEach(btn => {
       serviceSubmitBtn.disabled = true;
       serviceSubmitBtn.textContent = "Submitting...";
 
-      // Submit through a hidden iframe so the browser does not block the
-      // cross-origin Google Apps Script POST because of CORS.
       let frame = document.getElementById("serviceSubmitFrame");
       if (!frame) {
         frame = document.createElement("iframe");
