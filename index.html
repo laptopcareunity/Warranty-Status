@@ -651,7 +651,7 @@ tabBtns.forEach(btn => {
     Example:
     https://script.google.com/macros/s/XXXXXXXXXXXX/exec
   */
-  const SERVICE_BOOKING_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwndx4vyv72S776TaZHTNhuRWpSaIJRG5EWayjDSVVMwm9i2grn-DZtXKrwcw9DZeQ/exec";
+  const SERVICE_BOOKING_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrdlFYnnW4T-4CoYrupMNnUqxO81IvNJOA2jvvRiTB0aPVBV_MKBHMPRh7ce9jDe-e/exec";
 
   const serviceBookingForm = document.getElementById("serviceBookingForm");
   const serviceSubmitBtn = document.getElementById("serviceSubmitBtn");
@@ -686,7 +686,7 @@ tabBtns.forEach(btn => {
       serviceBookingForm.target = "serviceSubmitFrame";
 
       serviceFormMessage.style.display = "block";
-      serviceFormMessage.textContent = "Your service request has been submitted successfully.";
+      serviceFormMessage.textContent = "Your service request has been sent. Please wait a moment while we save your booking.";
 
       serviceBookingForm.submit();
 
