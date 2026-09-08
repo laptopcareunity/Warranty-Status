@@ -6,18 +6,19 @@
 <title>LaptopCare Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --bg:#ffffff;
     --surface:#1D2129;
     --border:#2C323D;
     --text:#070707;
+    --text-on-dark:#E8EAED;
     --muted:#7C8591;
     --accent:#4FB6A8;
     --accent-dim:#2E4A47;
     --warn:#E0A458;
     --radius:10px;
-    --text-on-dark:#E8EAED;
   }
   *{box-sizing:border-box;}
   body{
@@ -49,61 +50,32 @@
   header p{color:var(--muted); margin:0; font-size:0.95rem; line-height:1.5;}
 
   .tabs{
-    display:flex;
-    gap:4px;
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:4px;
-    margin-bottom:24px;
+    display:flex; gap:4px;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:10px; padding:4px; margin-bottom:24px;
   }
   .tab-btn{
-    flex:1;
-    background:transparent;
-    border:none;
-    color:var(--muted);
-    font-family:'IBM Plex Sans', sans-serif;
-    font-size:0.82rem;
-    font-weight:500;
-    padding:10px 6px;
-    border-radius:8px;
-    cursor:pointer;
+    flex:1; background:transparent; border:none; color:var(--muted);
+    font-family:'IBM Plex Sans', sans-serif; font-size:0.82rem; font-weight:500;
+    padding:10px 6px; border-radius:8px; cursor:pointer;
   }
   .tab-btn.active{background:var(--accent); color:#0C1210; font-weight:600;}
   .tab-panel{display:none;}
   .tab-panel.active{display:block;}
 
-  .search-card{
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:24px;
-  }
+  .search-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px;}
   label{display:block; font-size:0.85rem; color:var(--muted); margin-bottom:8px;}
   .input-row{display:flex; gap:10px;}
-  input[type="text"]{
-    flex:1;
-    background:var(--bg);
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:12px 14px;
-    color:var(--text);
-    font-family:'IBM Plex Mono', monospace;
-    font-size:0.95rem;
-    letter-spacing:0.02em;
-    outline:none;
+  input[type="text"], input[type="tel"], input[type="date"]{
+    flex:1; background:var(--bg); border:1px solid var(--border); border-radius:8px;
+    padding:12px 14px; color:var(--text); font-family:'IBM Plex Mono', monospace;
+    font-size:0.95rem; letter-spacing:0.02em; outline:none; width:100%;
   }
-  input[type="text"]:focus{border-color:var(--accent);}
-  input[type="text"]::placeholder{color:#4B525E; letter-spacing:normal; font-family:'IBM Plex Sans', sans-serif;}
+  input:focus{border-color:var(--accent);}
+  input::placeholder{color:#4B525E; letter-spacing:normal; font-family:'IBM Plex Sans', sans-serif;}
   button{
-    background:var(--accent);
-    color:#0C1210;
-    border:none;
-    border-radius:8px;
-    padding:0 20px;
-    font-weight:600;
-    font-size:0.95rem;
-    cursor:pointer;
+    background:var(--accent); color:#0C1210; border:none; border-radius:8px;
+    padding:0 20px; font-weight:600; font-size:0.95rem; cursor:pointer;
   }
   button:hover{opacity:0.9;}
   button:disabled{opacity:0.5; cursor:default;}
@@ -111,44 +83,16 @@
 
   .result{margin-top:24px; display:none;}
   .result.visible{display:block;}
-  .summary{
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:20px 22px;
-    margin-bottom:20px;
-  }
+  .summary{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px 22px; margin-bottom:20px;}
   .summary .label{color:var(--muted); font-size:0.8rem; margin-bottom:4px;}
   .summary .value{font-size:1.05rem; font-weight:500; color:var(--text-on-dark);}
   .summary .row{display:flex; justify-content:space-between; margin-top:14px; padding-top:14px; border-top:1px solid var(--border);}
-  .status-pill{
-    display:inline-block;
-    padding:4px 12px;
-    border-radius:20px;
-    background:var(--accent-dim);
-    color:var(--accent);
-    font-size:0.85rem;
-    font-weight:600;
-  }
+  .status-pill{display:inline-block; padding:4px 12px; border-radius:20px; background:var(--accent-dim); color:var(--accent); font-size:0.85rem; font-weight:600;}
   .status-pill.warn{background:#3A311F; color:var(--warn);}
-  .note-card{
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-left:3px solid var(--warn);
-    border-radius:var(--radius);
-    padding:16px 18px;
-    margin-bottom:20px;
-    font-size:0.9rem;
-  }
+  .note-card{background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--warn); border-radius:var(--radius); padding:16px 18px; margin-bottom:20px; font-size:0.9rem;}
   .note-card .value{color:var(--text-on-dark); line-height:1.5;}
 
-  .progress-wrap{
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:22px 20px 18px;
-    margin-bottom:20px;
-  }
+  .progress-wrap{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px 20px 18px; margin-bottom:20px;}
   .progress-bar{display:flex; gap:4px; height:8px;}
   .progress-bar .seg{flex:1; background:var(--border); border-radius:4px;}
   .progress-bar .seg.filled{background:var(--accent);}
@@ -160,30 +104,15 @@
   .error, .loading{margin-top:20px; padding:14px 16px; border-radius:8px; font-size:0.9rem;}
   .error{background:#3A2323; color:#E88A8A; border:1px solid #4A2C2C;}
   .loading{color:var(--muted);}
+  .success-msg{margin-top:16px; padding:14px 16px; border-radius:8px; font-size:0.9rem; background:var(--accent-dim); color:var(--accent); display:none;}
   footer{margin-top:40px; font-size:0.78rem; color:#4B525E; text-align:center;}
 
   .reserve-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px;}
   .reserve-card p{color:var(--muted); font-size:0.9rem; line-height:1.5; margin:0 0 16px;}
-
-
   .service-form{display:flex; flex-direction:column; gap:16px;}
   .form-field label{display:block; font-size:0.85rem; color:var(--muted); margin-bottom:7px;}
   .form-field label span{color:var(--warn);}
-  .form-field input{
-    width:100%;
-    background:var(--bg);
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:12px 14px;
-    color:var(--text);
-    font-family:'IBM Plex Sans', sans-serif;
-    font-size:0.92rem;
-    outline:none;
-  }
-  .form-field input:focus{border-color:var(--accent);}
-  .form-field input::placeholder{color:#4B525E;}
   .service-form button{width:100%; min-height:46px; margin-top:4px;}
-  .service-form-message{display:none; padding:12px 14px; border-radius:8px; font-size:0.88rem; line-height:1.4; background:var(--accent-dim); color:var(--accent);}
 </style>
 </head>
 <body>
@@ -212,7 +141,6 @@
       <h1>Warranty status</h1>
       <p>Enter your laptop's serial number to check your warranty repair status.</p>
     </header>
-
     <div class="search-card">
       <label for="warrantyLookup">Serial number</label>
       <div class="input-row">
@@ -221,41 +149,25 @@
       </div>
       <div class="hint">Case-insensitive. This matches the serial number printed on your Purchased Invoice.</div>
     </div>
-
     <div id="warrantyLoading" class="loading" style="display:none;">Looking up your record&hellip;</div>
     <div id="warrantyError" class="error" style="display:none;"></div>
-
     <div class="result" id="warrantyResult">
       <div class="summary">
         <div class="label">Status</div>
         <div class="value"><span id="warrantyStatusPill" class="status-pill">&mdash;</span></div>
         <div class="row">
-          <div>
-            <div class="label">Customer</div>
-            <div class="value" id="warrantyCustomerName">&mdash;</div>
-          </div>
-          <div style="text-align:right;">
-            <div class="label">Last updated</div>
-            <div class="value" id="warrantyLastUpdated">&mdash;</div>
-          </div>
+          <div><div class="label">Customer</div><div class="value" id="warrantyCustomerName">&mdash;</div></div>
+          <div style="text-align:right;"><div class="label">Last updated</div><div class="value" id="warrantyLastUpdated">&mdash;</div></div>
         </div>
         <div class="row">
-          <div>
-            <div class="label">Handover date</div>
-            <div class="value" id="warrantyHandoverDate">&mdash;</div>
-          </div>
-          <div style="text-align:right;" id="warrantyEtaRow">
-            <div class="label">Estimated completion</div>
-            <div class="value" id="warrantyEtaValue">&mdash;</div>
-          </div>
+          <div><div class="label">Handover date</div><div class="value" id="warrantyHandoverDate">&mdash;</div></div>
+          <div style="text-align:right;" id="warrantyEtaRow"><div class="label">Estimated completion</div><div class="value" id="warrantyEtaValue">&mdash;</div></div>
         </div>
       </div>
-
       <div class="progress-wrap">
         <div class="progress-bar" id="warrantyProgressBar"></div>
         <div class="progress-labels" id="warrantyProgressLabels"></div>
       </div>
-
       <div class="note-card" id="warrantyNoteCard" style="display:none;">
         <div class="label">Note from our service team</div>
         <div class="value" id="warrantyNoteValue" style="margin-top:6px; font-weight:400;"></div>
@@ -269,7 +181,6 @@
       <h1>Service status</h1>
       <p>Booked a service? Enter your serial number to see the date we've assigned and how the job is progressing.</p>
     </header>
-
     <div class="search-card">
       <label for="serviceLookup">Serial number</label>
       <div class="input-row">
@@ -278,41 +189,25 @@
       </div>
       <div class="hint">Use the same serial number you entered when booking.</div>
     </div>
-
     <div id="serviceLoading" class="loading" style="display:none;">Looking up your booking&hellip;</div>
     <div id="serviceError" class="error" style="display:none;"></div>
-
     <div class="result" id="serviceResult">
       <div class="summary">
         <div class="label">Status</div>
         <div class="value"><span id="serviceStatusPill" class="status-pill">&mdash;</span></div>
         <div class="row">
-          <div>
-            <div class="label">Customer</div>
-            <div class="value" id="serviceCustomerName">&mdash;</div>
-          </div>
-          <div style="text-align:right;">
-            <div class="label">Last updated</div>
-            <div class="value" id="serviceLastUpdated">&mdash;</div>
-          </div>
+          <div><div class="label">Customer</div><div class="value" id="serviceCustomerName">&mdash;</div></div>
+          <div style="text-align:right;"><div class="label">Last updated</div><div class="value" id="serviceLastUpdated">&mdash;</div></div>
         </div>
         <div class="row">
-          <div>
-            <div class="label">Scheduled date</div>
-            <div class="value" id="serviceScheduledDate">&mdash;</div>
-          </div>
-          <div style="text-align:right;" id="serviceEndRow">
-            <div class="label">Service end date</div>
-            <div class="value" id="serviceEndDate">&mdash;</div>
-          </div>
+          <div><div class="label">Scheduled date</div><div class="value" id="serviceScheduledDate">&mdash;</div></div>
+          <div style="text-align:right;" id="serviceEndRow"><div class="label">Service end date</div><div class="value" id="serviceEndDate">&mdash;</div></div>
         </div>
       </div>
-
       <div class="progress-wrap">
         <div class="progress-bar" id="serviceProgressBar"></div>
         <div class="progress-labels" id="serviceProgressLabels"></div>
       </div>
-
       <div class="note-card" id="serviceNoteCard" style="display:none;">
         <div class="label">Note from our service team</div>
         <div class="value" id="serviceNoteValue" style="margin-top:6px; font-weight:400;"></div>
@@ -328,109 +223,67 @@
     </header>
     <div class="reserve-card">
       <p>Fill in all the details below to request a service.</p>
-      <iframe name="serviceSubmitFrame" id="serviceSubmitFrame" style="display:none;"></iframe>
-        <form id="serviceBookingForm" class="service-form">
+      <form id="serviceBookingForm" class="service-form">
         <div class="form-field">
           <label for="bookingFullName">Full Name <span>*</span></label>
-          <input type="text" id="bookingFullName" name="fullName" required placeholder="Enter your full name">
+          <input type="text" id="bookingFullName" required placeholder="Enter your full name">
         </div>
-
         <div class="form-field">
           <label for="bookingPhone">Phone Number <span>*</span></label>
-          <input type="tel" id="bookingPhone" name="phoneNumber" required placeholder="Enter your phone number">
+          <input type="tel" id="bookingPhone" required placeholder="Enter your phone number">
         </div>
-
         <div class="form-field">
           <label for="bookingLaptop">Laptop Model <span>*</span></label>
-          <input type="text" id="bookingLaptop" name="laptopModel" required placeholder="Enter laptop model">
+          <input type="text" id="bookingLaptop" required placeholder="Enter laptop model">
         </div>
-
         <div class="form-field">
           <label for="bookingSerial">Serial Number <span>*</span></label>
-          <input type="text" id="bookingSerial" name="serialNumber" required placeholder="Enter serial number">
+          <input type="text" id="bookingSerial" required placeholder="Enter serial number">
         </div>
-
         <div class="form-field">
           <label for="bookingPurchaseDate">Purchase Date <span>*</span></label>
-          <input type="date" id="bookingPurchaseDate" name="purchaseDate" required>
+          <input type="date" id="bookingPurchaseDate" required>
         </div>
-
         <div class="form-field">
           <label for="bookingInvoice">Purchase Invoice Number <span>*</span></label>
-          <input type="text" id="bookingInvoice" name="invoiceNumber" required placeholder="Enter purchase invoice number">
+          <input type="text" id="bookingInvoice" required placeholder="Enter purchase invoice number">
         </div>
-
         <button type="submit" id="serviceSubmitBtn">Submit Service Request</button>
-        <div id="serviceFormMessage" class="service-form-message"></div>
+        <div id="serviceError2" class="error" style="display:none;"></div>
+        <div id="serviceSuccess" class="success-msg"></div>
       </form>
     </div>
   </div>
 
-  <footer>Updates are posted manually by our service team. If your status looks stale, contact us directly.</footer>
+  <footer>Updates are posted by our service team. If your status looks stale, contact us directly.</footer>
 </div>
 
 <script>
-const WARRANTY_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRcElB9lq25oarwBjdoh4_x8OnKvUZZKibCspAKZgZnKSdEwf37C9n8s4xU4E0NM750wsKTUPM0UrkH/pub?gid=0&single=true&output=csv";
-const SERVICE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRcElB9lq25oarwBjdoh4_x8OnKvUZZKibCspAKZgZnKSdEwf37C9n8s4xU4E0NM750wsKTUPM0UrkH/pub?gid=526123895&single=true&output=csv";
-
-const WARRANTY_DEMO_DATA = [
-  {SerialNumber:"SN12345", CustomerName:"Aditi Rao", Status:"In Repair", HandoverDate:"2026-09-01", LastUpdated:"2026-09-03", EstimatedCompletion:"2026-09-10", Notes:"Awaiting replacement screen from vendor"},
-  {SerialNumber:"SN99000", CustomerName:"Meera Nair", Status:"Received", HandoverDate:"2026-09-05", LastUpdated:"2026-09-05", EstimatedCompletion:"", Notes:""},
-  {SerialNumber:"SN77002", CustomerName:"Rohan Das", Status:"On Hold", HandoverDate:"2026-09-02", LastUpdated:"2026-09-04", EstimatedCompletion:"", Notes:"Warranty claim needs proof of purchase - please email a copy of your invoice"}
-];
-
-const SERVICE_DEMO_DATA = [
-  {SerialNumber:"SN88110", CustomerName:"Priya Menon", Status:"", ScheduledDate:"2026-09-12", ServiceEndDate:"", LastUpdated:"2026-09-06", Notes:"Please bring your charger too"},
-  {SerialNumber:"SN12345", CustomerName:"Aditi Rao", Status:"Service in Progress", ScheduledDate:"2026-09-01", ServiceEndDate:"", LastUpdated:"2026-09-03", Notes:""},
-  {SerialNumber:"SN70021", CustomerName:"Kabir Singh", Status:"Complete", ScheduledDate:"2026-08-20", ServiceEndDate:"2026-08-27", LastUpdated:"2026-08-27", Notes:""}
-];
+// =========================================================================
+// SUPABASE CONNECTION
+// =========================================================================
+const SUPABASE_URL = "https://nehnnhrtumcirtbgvndg.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_NJD1xoOGUMUFruYpx2LFJg_VBZkUyUj";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const WARRANTY_STAGES = ["Received","Diagnosis","Parts Ordered","In Repair","Ready for Pickup","Completed"];
 const SERVICE_STAGES  = ["Processing","Scheduled","Service in Progress","Complete"];
 
-function parseCSV(text){
-  const lines = text.trim().split(/\r?\n/);
-  const headers = lines[0].split(",").map(h => h.trim());
-  return lines.slice(1).filter(l => l.trim().length).map(line => {
-    const cells = line.split(",").map(c => c.trim());
-    const row = {};
-    headers.forEach((h, i) => row[h] = cells[i] || "");
-    return row;
-  });
-}
-
-async function fetchSheet(url, demoData){
-  if (!url || url.startsWith("PASTE_")){
-    return demoData;
-  }
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Could not reach the data source.");
-  const text = await res.text();
-  return parseCSV(text);
-}
-
 function renderBar(barEl, labelsEl, stages, currentIndex, onHold){
-  barEl.innerHTML = "";
-  labelsEl.innerHTML = "";
-
+  barEl.innerHTML = ""; labelsEl.innerHTML = "";
   if (onHold){
     const seg = document.createElement("div");
-    seg.className = "seg";
-    seg.style.background = "var(--warn)";
+    seg.className = "seg"; seg.style.background = "var(--warn)";
     barEl.appendChild(seg);
     const lab = document.createElement("span");
-    lab.className = "current";
-    lab.textContent = "On hold - see note above";
-    lab.style.flex = "1";
+    lab.className = "current"; lab.textContent = "On hold - see note above"; lab.style.flex = "1";
     labelsEl.appendChild(lab);
     return;
   }
-
   stages.forEach((stage, i) => {
     const seg = document.createElement("div");
     seg.className = "seg" + (i <= currentIndex ? " filled" : "");
     barEl.appendChild(seg);
-
     const lab = document.createElement("span");
     lab.textContent = stage;
     if (i < currentIndex) lab.className = "done";
@@ -439,8 +292,14 @@ function renderBar(barEl, labelsEl, stages, currentIndex, onHold){
   });
 }
 
+function fmtDate(d){
+  if (!d) return "\u2014";
+  return d;
+}
+
+/* ---------------------------- WARRANTY TAB ---------------------------- */
 async function checkWarranty(){
-  const idInput = document.getElementById("warrantyLookup").value.trim().toLowerCase();
+  const idInput = document.getElementById("warrantyLookup").value.trim();
   const errorBox = document.getElementById("warrantyError");
   const loading = document.getElementById("warrantyLoading");
   const result = document.getElementById("warrantyResult");
@@ -448,74 +307,61 @@ async function checkWarranty(){
 
   errorBox.style.display = "none";
   result.classList.remove("visible");
+  if (!idInput){ errorBox.textContent = "Enter a serial number first."; errorBox.style.display = "block"; return; }
 
-  if (!idInput){
-    errorBox.textContent = "Enter a serial number first.";
-    errorBox.style.display = "block";
-    return;
-  }
-
-  btn.disabled = true;
-  loading.style.display = "block";
-
+  btn.disabled = true; loading.style.display = "block";
   try{
-    const data = await fetchSheet(WARRANTY_SHEET_CSV_URL, WARRANTY_DEMO_DATA);
-    const match = data.find(row => (row.SerialNumber || "").toLowerCase() === idInput);
-
+    const { data, error } = await sb.from("warranty_status").select("*").ilike("serial_number", idInput).limit(1);
+    if (error) throw error;
+    const match = data && data[0];
     if (!match){
       errorBox.textContent = "We couldn't find a warranty record with that serial number.";
       errorBox.style.display = "block";
       return;
     }
-
-    document.getElementById("warrantyCustomerName").textContent = match.CustomerName || "\u2014";
-    document.getElementById("warrantyLastUpdated").textContent = match.LastUpdated || "\u2014";
-    document.getElementById("warrantyHandoverDate").textContent = match.HandoverDate || "\u2014";
+    document.getElementById("warrantyCustomerName").textContent = match.customer_name || "\u2014";
+    document.getElementById("warrantyLastUpdated").textContent = fmtDate(match.last_updated ? match.last_updated.split("T")[0] : "");
+    document.getElementById("warrantyHandoverDate").textContent = fmtDate(match.handover_date);
 
     const pill = document.getElementById("warrantyStatusPill");
-    const onHold = (match.Status || "").trim() === "On Hold";
-    pill.textContent = match.Status || "Unknown";
+    const onHold = (match.status || "").trim() === "On Hold";
+    pill.textContent = match.status || "Unknown";
     pill.className = "status-pill" + (onHold ? " warn" : "");
 
     const etaRow = document.getElementById("warrantyEtaRow");
-    if (match.EstimatedCompletion && match.EstimatedCompletion.trim()){
-      document.getElementById("warrantyEtaValue").textContent = match.EstimatedCompletion;
+    if (match.estimated_completion){
+      document.getElementById("warrantyEtaValue").textContent = match.estimated_completion;
       etaRow.style.visibility = "visible";
-    } else {
-      etaRow.style.visibility = "hidden";
-    }
+    } else { etaRow.style.visibility = "hidden"; }
 
     const noteCard = document.getElementById("warrantyNoteCard");
-    if (match.Notes && match.Notes.trim()){
-      document.getElementById("warrantyNoteValue").textContent = match.Notes;
+    if (match.notes && match.notes.trim()){
+      document.getElementById("warrantyNoteValue").textContent = match.notes;
       noteCard.style.display = "block";
-    } else {
-      noteCard.style.display = "none";
-    }
+    } else { noteCard.style.display = "none"; }
 
-    const idx = WARRANTY_STAGES.indexOf((match.Status || "").trim());
+    const idx = WARRANTY_STAGES.indexOf((match.status || "").trim());
     renderBar(document.getElementById("warrantyProgressBar"), document.getElementById("warrantyProgressLabels"), WARRANTY_STAGES, idx, onHold);
-
     result.classList.add("visible");
   } catch(err){
     errorBox.textContent = "Something went wrong reaching the warranty data. Please try again shortly.";
     errorBox.style.display = "block";
   } finally {
-    btn.disabled = false;
-    loading.style.display = "none";
+    btn.disabled = false; loading.style.display = "none";
   }
 }
 
+/* ---------------------------- SERVICE TAB ---------------------------- */
 function computeServiceStageIndex(match){
-  const status = (match.Status || "").trim();
+  const status = (match.status || "").trim();
   const idx = SERVICE_STAGES.indexOf(status);
   if (idx !== -1) return idx;
-  if (match.ScheduledDate && match.ScheduledDate.trim()) return 1;
+  if (match.scheduled_date) return 1;
   return 0;
 }
 
 async function checkService(){
-  const idInput = document.getElementById("serviceLookup").value.trim().toLowerCase();
+  const idInput = document.getElementById("serviceLookup").value.trim();
   const errorBox = document.getElementById("serviceError");
   const loading = document.getElementById("serviceLoading");
   const result = document.getElementById("serviceResult");
@@ -523,61 +369,47 @@ async function checkService(){
 
   errorBox.style.display = "none";
   result.classList.remove("visible");
+  if (!idInput){ errorBox.textContent = "Enter a serial number first."; errorBox.style.display = "block"; return; }
 
-  if (!idInput){
-    errorBox.textContent = "Enter a serial number first.";
-    errorBox.style.display = "block";
-    return;
-  }
-
-  btn.disabled = true;
-  loading.style.display = "block";
-
+  btn.disabled = true; loading.style.display = "block";
   try{
-    const data = await fetchSheet(SERVICE_SHEET_CSV_URL, SERVICE_DEMO_DATA);
-    const match = data.find(row => (row.SerialNumber || "").toLowerCase() === idInput);
-
+    const { data, error } = await sb.from("service_status").select("*").ilike("serial_number", idInput).order("id", { ascending:false }).limit(1);
+    if (error) throw error;
+    const match = data && data[0];
     if (!match){
       errorBox.textContent = "We couldn't find a service booking with that serial number. Have you booked yet? Try the \"Book a Service\" tab.";
       errorBox.style.display = "block";
       return;
     }
-
-    document.getElementById("serviceCustomerName").textContent = match.CustomerName || "\u2014";
-    document.getElementById("serviceLastUpdated").textContent = match.LastUpdated || "\u2014";
-    document.getElementById("serviceScheduledDate").textContent = match.ScheduledDate || "\u2014";
+    document.getElementById("serviceCustomerName").textContent = match.customer_name || "\u2014";
+    document.getElementById("serviceLastUpdated").textContent = fmtDate(match.last_updated ? match.last_updated.split("T")[0] : "");
+    document.getElementById("serviceScheduledDate").textContent = fmtDate(match.scheduled_date);
 
     const pill = document.getElementById("serviceStatusPill");
-    const onHold = (match.Status || "").trim() === "On Hold";
-    pill.textContent = (match.Status && match.Status.trim()) || SERVICE_STAGES[computeServiceStageIndex(match)];
+    const onHold = (match.status || "").trim() === "On Hold";
+    pill.textContent = (match.status && match.status.trim()) || SERVICE_STAGES[computeServiceStageIndex(match)];
     pill.className = "status-pill" + (onHold ? " warn" : "");
 
     const endRow = document.getElementById("serviceEndRow");
-    if (match.ServiceEndDate && match.ServiceEndDate.trim()){
-      document.getElementById("serviceEndDate").textContent = match.ServiceEndDate;
+    if (match.service_end_date){
+      document.getElementById("serviceEndDate").textContent = match.service_end_date;
       endRow.style.visibility = "visible";
-    } else {
-      endRow.style.visibility = "hidden";
-    }
+    } else { endRow.style.visibility = "hidden"; }
 
     const noteCard = document.getElementById("serviceNoteCard");
-    if (match.Notes && match.Notes.trim()){
-      document.getElementById("serviceNoteValue").textContent = match.Notes;
+    if (match.notes && match.notes.trim()){
+      document.getElementById("serviceNoteValue").textContent = match.notes;
       noteCard.style.display = "block";
-    } else {
-      noteCard.style.display = "none";
-    }
+    } else { noteCard.style.display = "none"; }
 
     const idx = computeServiceStageIndex(match);
     renderBar(document.getElementById("serviceProgressBar"), document.getElementById("serviceProgressLabels"), SERVICE_STAGES, idx, onHold);
-
     result.classList.add("visible");
   } catch(err){
     errorBox.textContent = "Something went wrong reaching the service data. Please try again shortly.";
     errorBox.style.display = "block";
   } finally {
-    btn.disabled = false;
-    loading.style.display = "none";
+    btn.disabled = false; loading.style.display = "none";
   }
 }
 
@@ -586,6 +418,40 @@ document.getElementById("warrantyLookup").addEventListener("keydown", e => { if 
 document.getElementById("serviceCheckBtn").addEventListener("click", checkService);
 document.getElementById("serviceLookup").addEventListener("keydown", e => { if (e.key === "Enter") checkService(); });
 
+/* ---------------------------- BOOK A SERVICE TAB ---------------------------- */
+document.getElementById("serviceBookingForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  const errorBox = document.getElementById("serviceError2");
+  const successBox = document.getElementById("serviceSuccess");
+  const btn = document.getElementById("serviceSubmitBtn");
+  errorBox.style.display = "none";
+  successBox.style.display = "none";
+
+  const payload = {
+    serial_number: document.getElementById("bookingSerial").value.trim(),
+    customer_name: document.getElementById("bookingFullName").value.trim(),
+    phone_number: document.getElementById("bookingPhone").value.trim(),
+    laptop_model: document.getElementById("bookingLaptop").value.trim(),
+    purchase_date: document.getElementById("bookingPurchaseDate").value || null,
+    invoice_number: document.getElementById("bookingInvoice").value.trim()
+  };
+
+  btn.disabled = true; btn.textContent = "Submitting...";
+  try{
+    const { error } = await sb.from("service_status").insert([payload]);
+    if (error) throw error;
+    successBox.textContent = "Your service request has been submitted. You can check its status under Service Status using your serial number once we've reviewed it.";
+    successBox.style.display = "block";
+    document.getElementById("serviceBookingForm").reset();
+  } catch(err){
+    errorBox.textContent = "Something went wrong submitting your request. Please try again.";
+    errorBox.style.display = "block";
+  } finally {
+    btn.disabled = false; btn.textContent = "Submit Service Request";
+  }
+});
+
+/* ---------------------------- TAB SWITCHING ---------------------------- */
 const tabBtns = document.querySelectorAll(".tab-btn");
 const tabPanels = document.querySelectorAll(".tab-panel");
 tabBtns.forEach(btn => {
@@ -596,53 +462,6 @@ tabBtns.forEach(btn => {
     document.getElementById(btn.dataset.tab).classList.add("active");
   });
 });
-</script>
-
-<script>
-  const SERVICE_BOOKING_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwndx4vyv72S776TaZHTNhuRWpSaIJRG5EWayjDSVVMwm9i2grn-DZtXKrwcw9DZeQ/exec";
-
-  const serviceBookingForm = document.getElementById("serviceBookingForm");
-  const serviceSubmitBtn = document.getElementById("serviceSubmitBtn");
-  const serviceFormMessage = document.getElementById("serviceFormMessage");
-
-  if (serviceBookingForm) {
-    serviceBookingForm.addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      if (SERVICE_BOOKING_WEB_APP_URL.startsWith("PASTE_")) {
-        serviceFormMessage.style.display = "block";
-        serviceFormMessage.textContent = "Google Sheet connection is not configured yet. Add your Google Apps Script Web App URL.";
-        return;
-      }
-
-      serviceSubmitBtn.disabled = true;
-      serviceSubmitBtn.textContent = "Submitting...";
-
-      let frame = document.getElementById("serviceSubmitFrame");
-      if (!frame) {
-        frame = document.createElement("iframe");
-        frame.name = "serviceSubmitFrame";
-        frame.id = "serviceSubmitFrame";
-        frame.style.display = "none";
-        document.body.appendChild(frame);
-      }
-
-      serviceBookingForm.action = SERVICE_BOOKING_WEB_APP_URL;
-      serviceBookingForm.method = "POST";
-      serviceBookingForm.target = "serviceSubmitFrame";
-
-      serviceFormMessage.style.display = "block";
-      serviceFormMessage.textContent = "Your service request has been sent. Please wait a moment while we save your booking.";
-
-      serviceBookingForm.submit();
-
-      setTimeout(() => {
-        serviceBookingForm.reset();
-        serviceSubmitBtn.disabled = false;
-        serviceSubmitBtn.textContent = "Submit Service Request";
-      }, 700);
-    });
-  }
 </script>
 </body>
 </html>
