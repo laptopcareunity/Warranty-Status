@@ -11,7 +11,7 @@ window.LC_CONFIG = {
     name: "LaptopCare",
     portalName: "Warranty & Service Portal",
     address: "3F1, 3rd Floor, Unity Plaza, Colombo 04",
-    phoneDisplay: "+94 775 741 069 / +9776 786 786",
+    phoneDisplay: "+94 775 741 069 / +94 776 786 786",
     phoneHref: "tel:+94775741069",
     website: "https://www.laptopcare.lk",
     websiteLabel: "www.laptopcare.lk",
