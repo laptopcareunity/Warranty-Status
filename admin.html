@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LaptopCare — Staff Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="assets/laptopcare-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/admin.css">
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ======================= top bar ======================= -->
+  <header class="topbar">
+    <div class="brand">
+      <img src="assets/laptopcare-logo.png" alt="LaptopCare logo">
+      <span><b>LaptopCare Staff Admin</b><span>Warranty &amp; service records</span></span>
+    </div>
+    <span class="badge warn who" id="staffEmail" title="Signed-in staff account">&mdash;</span>
+    <div class="actions">
+      <span class="badge" id="stamp">Not loaded yet</span>
+      <button class="btn btn-sm" id="refreshBtn" type="button" title="Reload records from the database">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
+        Refresh
+      </button>
+      <button class="btn btn-sm" id="logoutBtn" type="button">Log out</button>
+    </div>
+  </header>
+
+  <!-- ======================= login ======================= -->
+  <div id="loginCard" class="hidden">
+    <div class="login-wrap">
+      <div class="login-card">
+        <div class="logo-line"><img src="assets/laptopcare-logo.png" alt="LaptopCare logo"></div>
+        <h1>Staff sign in</h1>
+        <p class="sub">Use your LaptopCare staff account to manage warranty and service records.</p>
+        <form id="loginForm" novalidate>
+          <div class="field">
+            <label for="loginEmail">Email</label>
+            <input class="in" type="email" id="loginEmail" placeholder="you@laptopcare.lk" autocomplete="username" spellcheck="false">
+          </div>
+          <div class="field">
+            <label for="loginPassword">Password</label>
+            <div class="pw-row">
+              <input class="in" type="password" id="loginPassword" placeholder="Password" autocomplete="current-password">
+              <button class="pw-toggle" type="button" id="pwToggle">Show</button>
+            </div>
+          </div>
+          <button class="btn btn-primary" type="submit" id="loginBtn" style="width:100%">Sign in</button>
+          <div class="msg" id="loginError" role="alert" aria-live="assertive"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= dashboard ======================= -->
+  <div id="dashboard" class="hidden">
+
+    <!-- stat cards (populated by JS) -->
+    <div class="stats" id="stats" aria-label="Quick statistics"></div>
+
+    <!-- section tabs -->
+    <nav class="section-tabs">
+      <button class="section-tab active" data-section="secWarranty" type="button">Warranty records</button>
+      <button class="section-tab" data-section="secService" type="button">Service records</button>
+    </nav>
+
+    <!-- ============ WARRANTY ============ -->
+    <section class="section-panel active" id="secWarranty">
+      <div class="toolbar">
+        <h2>Warranty records <span class="count-chip" id="wCount"></span></h2>
+        <div class="search-box">
+          <span class="s-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+          <input class="in" type="text" id="wSearch" placeholder="Search serial, customer, note\u2026">
+        </div>
+        <select class="in" id="wFilter" title="Filter by status"></select>
+        <button class="btn btn-sm" id="wExportBtn" type="button">Export CSV</button>
+        <button class="btn btn-sm" id="wAddToggle" type="button">+ Add record</button>
+      </div>
+
+      <!-- add card -->
+      <div class="add-card hidden" id="wAddCard">
+        <h3>Add a new warranty record</h3>
+        <p class="add-note">New records start at the <strong>Received</strong> stage. Duplicate serial numbers are rejected.</p>
+        <div class="add-grid">
+          <input class="in mono" type="text" id="waSerial" placeholder="Serial number *" autocomplete="off" autocapitalize="characters" spellcheck="false">
+          <input class="in" type="text" id="waCustomer" placeholder="Customer name" autocomplete="off">
+          <input class="in" type="date" id="waHandover" title="Handover date">
+          <input class="in" type="date" id="waEst" title="Estimated completion">
+          <input class="in" type="text" id="waNotes" placeholder="Notes (visible to customer)" autocomplete="off">
+        </div>
+        <div class="add-actions">
+          <button class="btn btn-primary" id="waSave" type="button">Add record</button>
+          <button class="btn" id="waCancel" type="button">Cancel</button>
+          <div class="msg" id="waMsg" role="alert"></div>
+        </div>
+      </div>
+
+      <!-- table -->
+      <div class="table-card">
+        <div class="table-scroll">
+          <table id="warrantyTable">
+            <thead><tr>
+              <th>Serial</th><th>Customer</th><th>Status</th><th>Handover</th>
+              <th>Est. completion</th><th>Notes</th><th style="width:120px">Actions</th>
+            </tr></thead>
+            <tbody id="warrantyTbody">
+              <tr><td colspan="7"><div class="empty-state"><b>Loading&hellip;</b></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pager">
+          <span class="info" id="wPageInfo">&mdash;</span>
+          <span class="per">Rows <select class="in" id="wPerPage"><option>10</option><option selected>25</option><option>50</option><option>100</option><option value="all">All</option></select></span>
+          <div class="page-nav">
+            <button class="btn btn-sm" id="wPrev" type="button" disabled>&larr; Prev</button>
+            <button class="btn btn-sm" id="wNext" type="button">Next &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SERVICE ============ -->
+    <section class="section-panel" id="secService">
+      <div class="toolbar">
+        <h2>Service records <span class="count-chip" id="sCount"></span></h2>
+        <div class="search-box">
+          <span class="s-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+          <input class="in" type="text" id="sSearch" placeholder="Search serial, customer, phone\u2026">
+        </div>
+        <select class="in" id="sFilter" title="Filter by status"></select>
+        <button class="btn btn-sm" id="sExportBtn" type="button">Export CSV</button>
+        <button class="btn btn-sm" id="sAddToggle" type="button">+ Add record</button>
+      </div>
+
+      <!-- add card -->
+      <div class="add-card hidden" id="sAddCard">
+        <h3>Add a service record</h3>
+        <p class="add-note">Customer bookings arrive automatically and start at <strong>Processing</strong>. Use this form for walk-ins or phone bookings.</p>
+        <div class="add-grid">
+          <input class="in mono" type="text" id="saSerial" placeholder="Serial number *" autocomplete="off" autocapitalize="characters" spellcheck="false">
+          <input class="in" type="text" id="saCustomer" placeholder="Customer name" autocomplete="off">
+          <input class="in" type="tel" id="saPhone" placeholder="Phone number" autocomplete="off">
+          <input class="in" type="text" id="saLaptop" placeholder="Laptop model" autocomplete="off">
+          <input class="in" type="date" id="saPurchase" title="Purchase date">
+          <input class="in" type="text" id="saInvoice" placeholder="Invoice number" autocomplete="off">
+          <input class="in" type="text" id="saNotes" placeholder="Notes (visible to customer)" autocomplete="off">
+        </div>
+        <div class="add-actions">
+          <button class="btn btn-primary" id="saSave" type="button">Add record</button>
+          <button class="btn" id="saCancel" type="button">Cancel</button>
+          <div class="msg" id="saMsg" role="alert"></div>
+        </div>
+      </div>
+
+      <!-- table -->
+      <div class="table-card">
+        <div class="table-scroll">
+          <table id="serviceTable">
+            <thead><tr>
+              <th>Serial</th><th>Customer</th><th>Phone</th><th>Laptop model</th>
+              <th>Purchase</th><th>Invoice</th><th>Status</th><th>Scheduled</th>
+              <th>End date</th><th>Notes</th><th style="width:120px">Actions</th>
+            </tr></thead>
+            <tbody id="serviceTbody">
+              <tr><td colspan="11"><div class="empty-state"><b>Loading&hellip;</b></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pager">
+          <span class="info" id="sPageInfo">&mdash;</span>
+          <span class="per">Rows <select class="in" id="sPerPage"><option>10</option><option selected>25</option><option>50</option><option>100</option><option value="all">All</option></select></span>
+          <div class="page-nav">
+            <button class="btn btn-sm" id="sPrev" type="button" disabled>&larr; Prev</button>
+            <button class="btn btn-sm" id="sNext" type="button">Next &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="admin-foot">LaptopCare internal tool &middot; only for authorised staff &middot; 3F1, Unity Plaza, Colombo 04</footer>
+</div>
+
+<div id="toasts" aria-live="polite"></div>
+
+<script src="assets/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/admin.js"></script>
+</body>
+</html>

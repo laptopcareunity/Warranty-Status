@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LaptopCare — Warranty &amp; Service Portal</title>
+<meta name="description" content="Check your laptop's warranty or service status by serial number, or book a repair with LaptopCare, Colombo 04.">
+<link rel="icon" type="image/png" href="assets/laptopcare-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/customer.css">
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ======================= header ======================= -->
+  <header class="site-head">
+    <div class="head-inner">
+      <a class="brand" href="index.html">
+        <img src="assets/laptopcare-logo.png" alt="LaptopCare logo">
+      </a>
+      <div class="head-contacts">
+        <a class="btn btn-ghost btn-sm" href="tel:+94775741069">&#9990; +94 775 741 069</a>
+        <a class="btn btn-ghost btn-sm" href="mailto:laptopcareunity@gmail.com">&#9993; Email us</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================= hero ======================= -->
+  <section class="hero">
+    <h1>Track your laptop's warranty &amp; service</h1>
+    <p>Enter the serial number printed on your LaptopCare invoice to see the live status of your device — or book a service in under a minute.</p>
+  </section>
+
+  <!-- ======================= tabs ======================= -->
+  <nav class="seg-tabs" role="tablist" aria-label="Portal sections">
+    <button class="seg-btn active" data-tab="warranty" role="tab" aria-selected="true">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/><path d="m9 11.5 2 2 4-4.5"/></svg>
+      Warranty Status
+    </button>
+    <button class="seg-btn" data-tab="service" role="tab" aria-selected="false">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4.5 4.5 0 0 0-6.1 5.6L3 17.5V21h3.5l5.6-5.6a4.5 4.5 0 0 0 5.6-6.1l-2.9 2.9-2.8-.7-.7-2.8 2.9-2.9z"/></svg>
+      Service Status
+    </button>
+    <button class="seg-btn" data-tab="book" role="tab" aria-selected="false">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18M12 14v4M10 16h4"/></svg>
+      Book a Service
+    </button>
+  </nav>
+
+  <!-- =================== PANEL: WARRANTY =================== -->
+  <section class="panel active" id="panel-warranty" role="tabpanel">
+    <div class="card search-card">
+      <div class="p-head">
+        <h2>Check warranty status</h2>
+        <p>Find the current stage of your warranty repair — from receipt of the laptop to ready for pickup.</p>
+      </div>
+      <form id="warrantyForm" novalidate>
+        <label class="search-label" for="warrantyLookup">Serial number</label>
+        <div class="search-row">
+          <input class="in mono" type="text" id="warrantyLookup" placeholder="e.g. SN12345" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="warrantyHint">
+          <button class="btn btn-primary" type="submit" id="warrantyCheckBtn">Check status</button>
+        </div>
+        <p class="hint" id="warrantyHint">Case-insensitive — it matches the serial number printed on your Purchased Invoice.</p>
+      </form>
+      <div class="recent" id="warrantyRecent" aria-label="Recent warranty lookups"></div>
+      <div class="msg" id="warrantyMsg" role="status" aria-live="polite"></div>
+    </div>
+
+    <!-- result -->
+    <div class="card result-card hidden" id="warrantyResult">
+      <div class="status-banner tone-slate" id="wStatusBanner">
+        <div class="status-main">
+          <span class="lbl">Warranty status</span>
+          <div class="big" id="wStatusBig">&mdash;</div>
+        </div>
+        <span class="pill" id="wStatusPill">&mdash;</span>
+        <span class="updated">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          <span id="wBannerUpdated">&mdash;</span>
+        </span>
+      </div>
+
+      <div class="info-grid">
+        <div class="cell"><div class="lbl">Serial number</div><div class="val mono" id="wSerialVal">&mdash;</div></div>
+        <div class="cell"><div class="lbl">Customer</div><div class="val" id="wCustomerVal">&mdash;</div></div>
+        <div class="cell"><div class="lbl">Handover date</div><div class="val" id="wHandoverVal">&mdash;</div></div>
+        <div class="cell"><div class="lbl">Estimated completion</div><div class="val" id="wEstVal">&mdash;</div></div>
+      </div>
+
+      <div class="timeline-card">
+        <p class="tl-title">Progress through repair</p>
+        <div class="track" id="wTrack"></div>
+      </div>
+      <div class="msg msg-warn" id="wHoldNote" role="status">
+        <span>This record is currently <strong>On Hold</strong>. Our team will resume it shortly &mdash; call us anytime for an update.</span>
+      </div>
+
+      <div class="note-card hidden" id="wNote">
+        <div class="lbl">Note from our service team</div>
+        <div class="val" id="wNoteValue"></div>
+      </div>
+
+      <div class="result-actions">
+        <button class="btn btn-ghost btn-sm hidden" id="wBookBtn">Book a service for this device</button>
+        <a class="btn btn-ghost btn-sm" id="wAskLink" href="mailto:laptopcareunity@gmail.com">Ask a question about this repair</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== PANEL: SERVICE =================== -->
+  <section class="panel" id="panel-service" role="tabpanel">
+    <div class="card search-card">
+      <div class="p-head">
+        <h2>Check service status</h2>
+        <p>Booked a service with us? Enter the same serial number to see the assigned date and how the job is progressing.</p>
+      </div>
+      <form id="serviceForm" novalidate>
+        <label class="search-label" for="serviceLookup">Serial number</label>
+        <div class="search-row">
+          <input class="in mono" type="text" id="serviceLookup" placeholder="e.g. SN12345" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="serviceHint">
+          <button class="btn btn-primary" type="submit" id="serviceCheckBtn">Check status</button>
+        </div>
+        <p class="hint" id="serviceHint">Use the same serial number you entered when booking.</p>
+      </form>
+      <div class="recent" id="serviceRecent" aria-label="Recent service lookups"></div>
+      <div class="msg" id="serviceMsg" role="status" aria-live="polite"></div>
+    </div>
+
+    <!-- result -->
+    <div class="card result-card hidden" id="serviceResult">
+      <div class="status-banner tone-slate" id="sStatusBanner">
+        <div class="status-main">
+          <span class="lbl">Service status</span>
+          <div class="big" id="sStatusBig">&mdash;</div>
+        </div>
+        <span class="pill" id="sStatusPill">&mdash;</span>
+        <span class="updated">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          <span id="sBannerUpdated">&mdash;</span>
+        </span>
+      </div>
+
+      <div class="info-grid">
+        <div class="cell"><div class="lbl">Serial number</div><div class="val mono" id="sSerialVal">&mdash;</div></div>
+        <div class="cell"><div class="lbl">Customer</div><div class="val" id="sCustomerVal">&mdash;</div></div>
+        <div class="cell"><div class="lbl">Scheduled date</div><div class="val" id="sScheduledVal">&mdash;</div></div>
+        <div class="cell"><div class="lbl">Service end date</div><div class="val" id="sEndVal">&mdash;</div></div>
+      </div>
+
+      <div class="timeline-card">
+        <p class="tl-title">Progress through service</p>
+        <div class="track" id="sTrack"></div>
+      </div>
+      <div class="msg msg-warn" id="sHoldNote" role="status">
+        <span>This booking is currently <strong>On Hold</strong>. Our team will resume it shortly &mdash; call us anytime for an update.</span>
+      </div>
+
+      <div class="note-card hidden" id="sNote">
+        <div class="lbl">Note from our service team</div>
+        <div class="val" id="sNoteValue"></div>
+      </div>
+
+      <div class="result-actions">
+        <a class="btn btn-ghost btn-sm" id="sAskLink" href="mailto:laptopcareunity@gmail.com">Ask a question about this booking</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== PANEL: BOOK A SERVICE =================== -->
+  <section class="panel" id="panel-book" role="tabpanel">
+    <div class="card form-card">
+      <div class="p-head">
+        <h2>Book a service</h2>
+        <p>Fill in the details below and our team will review your request, assign a service date, and post updates under <strong>Service Status</strong> — tracked with the same serial number.</p>
+      </div>
+      <form id="bookingForm" novalidate>
+        <div class="form-grid">
+          <div class="f-group half">
+            <label for="bkName">Full name <span class="req">*</span></label>
+            <input class="in" type="text" id="bkName" name="name" data-err="errName" placeholder="Enter your full name" autocomplete="name">
+            <div class="field-err" id="errName"></div>
+          </div>
+          <div class="f-group half">
+            <label for="bkPhone">Phone number <span class="req">*</span></label>
+            <input class="in" type="tel" id="bkPhone" name="phone" data-err="errPhone" placeholder="e.g. 077 574 1069" autocomplete="tel">
+            <div class="field-err" id="errPhone"></div>
+          </div>
+
+          <div class="f-group">
+            <label for="bkLaptop">Laptop model <span class="req">*</span></label>
+            <input class="in" type="text" id="bkLaptop" name="laptop" data-err="errLaptop" placeholder="e.g. Dell Latitude 5420, MacBook Air M2" autocomplete="off">
+            <div class="field-err" id="errLaptop"></div>
+          </div>
+          <div class="f-group half">
+            <label for="bkSerial">Serial number <span class="req">*</span></label>
+            <input class="in mono" type="text" id="bkSerial" name="serial" data-err="errSerial" placeholder="Serial number of the laptop" autocomplete="off" autocapitalize="characters" spellcheck="false">
+            <div class="field-err" id="errSerial"></div>
+          </div>
+          <div class="f-group half">
+            <label for="bkPurchase">Purchase date <span class="req">*</span></label>
+            <input class="in" type="date" id="bkPurchase" name="purchase" data-err="errPurchase">
+            <div class="field-err" id="errPurchase"></div>
+          </div>
+          <div class="f-group">
+            <label for="bkInvoice">Purchase invoice number <span class="req">*</span></label>
+            <input class="in" type="text" id="bkInvoice" name="invoice" data-err="errInvoice" placeholder="Invoice number from your purchase" autocomplete="off" autocapitalize="characters" spellcheck="false">
+            <div class="field-err" id="errInvoice"></div>
+          </div>
+        </div>
+
+        <div class="msg msg-warn" id="bkDupNote" role="status" aria-live="polite"><span id="bkDupText"></span></div>
+        <div class="msg" id="bookingMsg" role="alert" aria-live="assertive"></div>
+
+        <button class="btn btn-primary" type="submit" id="bookingSubmitBtn">Submit Service Request</button>
+      </form>
+
+      <!-- success state -->
+      <div class="hidden" id="bookingSuccess">
+        <div class="success-card">
+          <div class="success-icon">&#10003;</div>
+          <h2>Request received!</h2>
+          <p class="sub">Our team will review your request and assign a service date. Track everything under <strong>Service Status</strong> using the serial number below.</p>
+          <div class="summ">
+            <div class="srow"><span>Full name</span><span id="bkDoneName">&mdash;</span></div>
+            <div class="srow"><span>Serial number</span><span class="mono" id="bkDoneSerial">&mdash;</span></div>
+            <div class="srow"><span>Laptop model</span><span id="bkDoneLaptop">&mdash;</span></div>
+            <div class="srow"><span>Phone number</span><span id="bkDonePhone">&mdash;</span></div>
+            <div class="srow"><span>Purchase date</span><span id="bkDonePurchase">&mdash;</span></div>
+            <div class="srow"><span>Invoice number</span><span class="mono" id="bkDoneInvoice">&mdash;</span></div>
+          </div>
+          <div class="success-actions">
+            <button class="btn btn-primary" id="bkTrackBtn">Check service status now</button>
+            <button class="btn btn-ghost" id="bkAnotherBtn">Submit another request</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= FAQ ======================= -->
+  <section class="card faq-card">
+    <h2>Good to know</h2>
+
+    <details class="faq">
+      <summary>Where do I find my serial number?</summary>
+      <div class="faq-body">The serial number is printed on your LaptopCare purchase invoice, and it is usually also on the underside of the laptop (look for "SN" or "Serial No."). Both the warranty and service status use the same number.</div>
+    </details>
+    <details class="faq">
+      <summary>What does each stage mean?</summary>
+      <div class="faq-body"><strong>Warranty:</strong> Received &rarr; Diagnosis &rarr; Parts Ordered &rarr; In Repair &rarr; Ready for Pickup &rarr; Completed.<br>
+      <strong>Service:</strong> Processing &rarr; Scheduled &rarr; Service in Progress &rarr; Complete.<br>
+      If a job is paused for any reason we mark it <strong>On Hold</strong> and add a note you can read on this page.</div>
+    </details>
+    <details class="faq">
+      <summary>How long will my repair take?</summary>
+      <div class="faq-body">It depends on the fault and on parts availability. Once your device reaches our bench we post a note with the estimated completion date on this page, and the status bar moves at every stage.</div>
+    </details>
+    <details class="faq">
+      <summary>Still have questions?</summary>
+      <div class="faq-body">Call <a href="tel:+94775741069">+94 775 741 069</a>, email <a href="mailto:laptopcareunity@gmail.com">laptopcareunity@gmail.com</a>, or visit us at Unity Plaza, Colombo 04 &mdash; we are happy to help.</div>
+    </details>
+  </section>
+
+  <!-- ======================= contact strip ======================= -->
+  <div class="contact-strip">
+    <a class="card contact-card" href="tel:+94775741069">
+      <span class="c-ico">&#9742;</span>
+      <span><strong>Call us</strong><span>+94 775 741 069<br>+9776 786 786</span></span>
+    </a>
+    <a class="card contact-card" href="mailto:laptopcareunity@gmail.com">
+      <span class="c-ico">&#9993;</span>
+      <span><strong>Email us</strong><span>laptopcareunity@gmail.com</span></span>
+    </a>
+    <a class="card contact-card" href="https://www.laptopcare.lk" target="_blank" rel="noopener">
+      <span class="c-ico">&#9737;</span>
+      <span><strong>Visit us</strong><span>3F1, 3rd Floor, Unity Plaza, Colombo 04 &mdash; laptopcare.lk</span></span>
+    </a>
+  </div>
+
+  <footer class="site-foot">
+    <span>&copy; <span id="year">2026</span> LaptopCare &middot; 3F1, Unity Plaza, Colombo 04 &middot; <a href="https://www.laptopcare.lk" target="_blank" rel="noopener">www.laptopcare.lk</a></span><br>
+    Status updates are posted by our service team. If your record looks stale, contact us directly.
+  </footer>
+</div>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+<script src="assets/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/customer.js"></script>
+</body>
+</html>
